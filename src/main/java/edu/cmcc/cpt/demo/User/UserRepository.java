@@ -14,17 +14,17 @@ public class UserRepository {
     private JdbcTemplate jdbcTemplate;
 
     public List<User> findAll() {
-        String sql = "SELECT * FROM [user]";
+        String sql = "SELECT id, first_name, last_name, username FROM [user]";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(User.class));
     }
 
     public User findById(int id) {
-        String sql = "SELECT * FROM [user] WHERE id = ?";
+        String sql = "SELECT id, first_name, last_name, username FROM [user] WHERE id = ?";
         return jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(User.class), id);
     }
 
     public User findByUsername(String username) {
-        String sql = "SELECT * FROM [user] WHERE username = ?";
+        String sql = "SELECT id, first_name, last_name, username FROM [user] WHERE username = ?";
         return jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(User.class), username);
     }
 
