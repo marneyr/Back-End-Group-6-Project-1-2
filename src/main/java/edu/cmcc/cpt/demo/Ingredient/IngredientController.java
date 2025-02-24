@@ -14,9 +14,6 @@ public class IngredientController {
     @Autowired
     private IngredientRepository ingredientRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     @GetMapping
     public List<Ingredient> getAllIngredients() {
         return ingredientRepository.findAll();
@@ -30,27 +27,25 @@ public class IngredientController {
 
     @PostMapping
     public ResponseEntity<String> createIngredient(@RequestBody Ingredient ingredient) {
-        ingredient.setPassword(passwordEncoder.encode(ingredient.getPassword())); // Encrypt password
         ingredientRepository.save(ingredient);
         return ResponseEntity.ok("Ingredient created successfully with encrypted password.");
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Ingredient submittedIngredient) {
-        Ingredient ingredient = ingredientRepository.findByUsername(submittedIngredient.getUsername());
-        if (ingredient != null && passwordEncoder.matches(ingredient.getPassword(), ingredient.getPassword())) {
-            return ResponseEntity.ok("Login successful.");
-        } else {
-            return ResponseEntity.status(401).body("Invalid username or password.");
-        }
-    }
-
     @PutMapping("/{ingredient_id}")
     public ResponseEntity<String> updateIngredient(@PathVariable int ingredient_id, @RequestBody Ingredient ingredient) {
-        ingredient.setPassword(passwordEncoder.encode(ingredient.getPassword())); // Encrypt password
-        int rowsAffected = ingredientRepository.update(id, ingredient);
-        return rowsAffected > 0 ? ResponseEntity.ok("Ingredient updated.") : ResponseEntity.notFound().build();
+        Ingredient updateIngredient = ingredientRepository.findByIngredientId(ingredient_id); //.orElseThrow(()-> new ResourceNotFoundException("Ingredient does not exist with id: " + ingredient_id));
+        updateIngredient.setRecipeId(ingredient.getRecipeId());
+        updateIngredient.setQuantity(ingredient.getQuantity());
+        updateIngredient.setIngredientName(ingredient.getIngredientName());
+        updateIngredient.setUnit(ingredient.getUnit());
+
+        ingredientRepository.save(updateIngredient);
+
+        return ResponseEntity.ok("Ingredient updated successfully.");
+
     }
+
+    
 
     @DeleteMapping("/{ingredient_id}")
     public ResponseEntity<String> deleteIngredient(@PathVariable int ingredient_id) {

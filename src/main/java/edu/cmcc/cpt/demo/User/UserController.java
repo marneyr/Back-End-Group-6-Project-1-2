@@ -22,9 +22,9 @@ public class UserController {
         return userRepository.findAll();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable int id) {
-        User user = userRepository.findById(id);
+    @GetMapping("/{user_id}")
+    public ResponseEntity<User> getUserByUserId(@PathVariable int user_id) {
+        User user = userRepository.findByUserId(user_id);
         return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
     }
 
@@ -45,16 +45,16 @@ public class UserController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable int id, @RequestBody User user) {
+    @PutMapping("/{user_id}")
+    public ResponseEntity<String> updateUser(@PathVariable int user_id, @RequestBody User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword())); // Encrypt password
-        int rowsAffected = userRepository.update(id, user);
+        int rowsAffected = userRepository.update(user_id, user);
         return rowsAffected > 0 ? ResponseEntity.ok("User updated.") : ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable int id) {
-        int rowsAffected = userRepository.deleteById(id);
+    @DeleteMapping("/{user_id}")
+    public ResponseEntity<String> deleteUser(@PathVariable int user_id) {
+        int rowsAffected = userRepository.deleteByUserId(user_id);
         return rowsAffected > 0 ? ResponseEntity.ok("User deleted.") : ResponseEntity.notFound().build();
     }
 }

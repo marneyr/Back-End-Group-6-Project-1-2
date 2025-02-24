@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import edu.cmcc.cpt.demo.Step.Step;
+
 import java.util.List;
 
 @RestController
@@ -13,9 +15,6 @@ public class StepController {
 
     @Autowired
     private StepRepository stepRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @GetMapping
     public List<Step> getAllSteps() {
@@ -30,26 +29,22 @@ public class StepController {
 
     @PostMapping
     public ResponseEntity<String> createStep(@RequestBody Step step) {
-        step.setPassword(passwordEncoder.encode(step.getPassword())); // Encrypt password
         stepRepository.save(step);
-        return ResponseEntity.ok("Step created successfully with encrypted password.");
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Step submittedUser) {
-        Step step = stepRepository.findByUsername(submittedUser.getUsername());
-        if (step != null && passwordEncoder.matches(step.getPassword(), step.getPassword())) {
-            return ResponseEntity.ok("Login successful.");
-        } else {
-            return ResponseEntity.status(401).body("Invalid username or password.");
-        }
+        return ResponseEntity.ok("Step created successfully.");
     }
 
     @PutMapping("/{step_id}")
     public ResponseEntity<String> updateStep(@PathVariable int step_id, @RequestBody Step step) {
-        step.setPassword(passwordEncoder.encode(step.getPassword())); // Encrypt password
-        int rowsAffected = stepRepository.update(step_id, step);
-        return rowsAffected > 0 ? ResponseEntity.ok("Step updated.") : ResponseEntity.notFound().build();
+        Step updateStep = stepRepository.findByStepId(step_id); //.orElseThrow(()-> new ResourceNotFoundException("Step does not exist with id: " + step_id));
+        updateStep.setStepId(step.getStepId());
+        updateStep.setRecipeId(step.getRecipeId());
+        updateStep.setStepOrder(step.getStepOrder());
+        updateStep.setStepDescription(step.getStepDescription());
+        updateStep.setEstimatedTimeMinutes(step.getEstimatedTimeMinutes());
+
+        stepRepository.save(updateStep);
+
+        return ResponseEntity.ok("Step updated successfully.");
     }
 
     @DeleteMapping("/{step_id}")

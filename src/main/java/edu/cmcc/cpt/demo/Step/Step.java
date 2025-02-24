@@ -17,8 +17,8 @@ public class Step {
     public int getStepOrder() { return step_order; }
     public void setStepOrder(int step_order) { this.step_order = step_order; }
 
-    public String getFirstName() { return step_description; }
-    public void setFirstName(String step_description) { this.step_description = step_description; }
+    public String getStepDescription() { return step_description; }
+    public void setStepDescription(String step_description) { this.step_description = step_description; }
 
     public int getEstimatedTimeMinutes() { return estimated_time_minutes; }
     public void setEstimatedTimeMinutes(int estimated_time_minutes) { this.estimated_time_minutes = estimated_time_minutes; }
