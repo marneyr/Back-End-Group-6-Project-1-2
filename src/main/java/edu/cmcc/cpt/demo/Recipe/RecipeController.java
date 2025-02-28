@@ -2,10 +2,7 @@ package edu.cmcc.cpt.demo.Recipe;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import edu.cmcc.cpt.demo.Recipe.Recipe;
 
 import java.util.List;
 
@@ -35,7 +32,7 @@ public class RecipeController {
 
     @PutMapping("/{recipe_id}")
     public ResponseEntity<String> updateRecipe(@PathVariable int recipe_id, @RequestBody Recipe recipe) {
-        Recipe updateRecipe = recipeRepository.findByRecipeId(recipe_id); //.orElseThrow(()-> new ResourceNotFoundException("Recipe does not exist with id: " + recipe_id));
+        Recipe updateRecipe = recipeRepository.findByRecipeId(recipe_id); 
         updateRecipe.setRecipeId(recipe.getRecipeId());
         updateRecipe.setUserId(recipe.getRecipeId());
         updateRecipe.setName(recipe.getName());

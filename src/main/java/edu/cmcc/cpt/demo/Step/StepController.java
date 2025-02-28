@@ -2,10 +2,7 @@ package edu.cmcc.cpt.demo.Step;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import edu.cmcc.cpt.demo.Step.Step;
 
 import java.util.List;
 
@@ -35,7 +32,7 @@ public class StepController {
 
     @PutMapping("/{step_id}")
     public ResponseEntity<String> updateStep(@PathVariable int step_id, @RequestBody Step step) {
-        Step updateStep = stepRepository.findByStepId(step_id); //.orElseThrow(()-> new ResourceNotFoundException("Step does not exist with id: " + step_id));
+        Step updateStep = stepRepository.findByStepId(step_id); 
         updateStep.setStepId(step.getStepId());
         updateStep.setRecipeId(step.getRecipeId());
         updateStep.setStepOrder(step.getStepOrder());

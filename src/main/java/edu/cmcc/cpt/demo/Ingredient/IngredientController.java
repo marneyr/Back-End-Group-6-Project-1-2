@@ -2,7 +2,6 @@ package edu.cmcc.cpt.demo.Ingredient;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,7 +32,7 @@ public class IngredientController {
 
     @PutMapping("/{ingredient_id}")
     public ResponseEntity<String> updateIngredient(@PathVariable int ingredient_id, @RequestBody Ingredient ingredient) {
-        Ingredient updateIngredient = ingredientRepository.findByIngredientId(ingredient_id); //.orElseThrow(()-> new ResourceNotFoundException("Ingredient does not exist with id: " + ingredient_id));
+        Ingredient updateIngredient = ingredientRepository.findByIngredientId(ingredient_id); 
         updateIngredient.setRecipeId(ingredient.getRecipeId());
         updateIngredient.setQuantity(ingredient.getQuantity());
         updateIngredient.setIngredientName(ingredient.getIngredientName());
