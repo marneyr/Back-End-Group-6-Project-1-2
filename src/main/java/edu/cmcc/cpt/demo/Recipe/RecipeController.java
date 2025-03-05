@@ -27,7 +27,7 @@ public class RecipeController {
     @PostMapping
     public ResponseEntity<String> createRecipe(@RequestBody Recipe recipe) {
         recipeRepository.save(recipe);
-        return ResponseEntity.ok("Recipe created successfully with encrypted password.");
+        return ResponseEntity.ok("Recipe created successfully.");
     }
 
     @PutMapping("/{recipe_id}")
