@@ -38,7 +38,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody User submittedUser) {
         User user = userRepository.findByUsername(submittedUser.getUsername());
-        if (user != null && passwordEncoder.matches(user.getPassword(), user.getPassword())) {
+        if (user != null && passwordEncoder.matches(submittedUser.getPassword(), user.getPassword())) {
             return ResponseEntity.ok("Login successful.");
         } else {
             return ResponseEntity.status(401).body("Invalid username or password.");
@@ -56,5 +56,11 @@ public class UserController {
     public ResponseEntity<String> deleteUser(@PathVariable int user_id) {
         int rowsAffected = userRepository.deleteByUserId(user_id);
         return rowsAffected > 0 ? ResponseEntity.ok("User deleted.") : ResponseEntity.notFound().build();
+    }
+
+    // Add test endpoint to check if controller works without DB
+    @GetMapping("/test")
+    public String testEndpoint() {
+        return "UserController is working!";
     }
 }
