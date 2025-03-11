@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Arrays;
 
 @RestController
 @RequestMapping("/api/recipes")
@@ -37,6 +38,19 @@ public class RecipeController {
     @PostMapping
     public ResponseEntity<String> createRecipe(@RequestBody Recipe recipe) {
         try {
+            System.out.println("Received recipe: " + recipe.getName());
+            
+            Object ingredients = recipe.getIngredients();
+            if (ingredients != null) {
+                if (ingredients instanceof String[]) {
+                    System.out.println("Ingredients: " + Arrays.toString((String[])ingredients));
+                } else {
+                    System.out.println("Ingredients: " + ingredients.toString());
+                }
+            } else {
+                System.out.println("Ingredients: null");
+            }
+            
             recipeRepository.save(recipe);
             return ResponseEntity.ok("Recipe created successfully.");
         } catch (Exception e) {
@@ -54,17 +68,48 @@ public class RecipeController {
                 return ResponseEntity.notFound().build();
             }
             
-            // Update the existing recipe with new values
+            // Update name (required field)
             existingRecipe.setName(recipe.getName());
+            
+            // Update userId (required field)
             existingRecipe.setUserId(recipe.getUserId());
-
-            try {
-                recipeRepository.update(recipe_id, existingRecipe);
-            } catch (Exception ex) {
-                recipeRepository.save(existingRecipe);
+            
+            // Update optional fields only if provided in the request
+            if (recipe.getCookingTime() != null) {
+                existingRecipe.setCookingTime(recipe.getCookingTime());
+            }
+            
+            if (recipe.getDifficulty() != null) {
+                existingRecipe.setDifficulty(recipe.getDifficulty());
+            }
+            
+            if (recipe.getServings() > 0) {
+                existingRecipe.setServings(recipe.getServings());
+            }
+            
+            if (recipe.getIngredients() != null) {
+                existingRecipe.setIngredients(recipe.getIngredients());
+            }
+            
+            if (recipe.getInstructions() != null) {
+                existingRecipe.setInstructions(recipe.getInstructions());
             }
 
-            return ResponseEntity.ok("Recipe updated successfully.");
+            System.out.println("Updating recipe: " + existingRecipe.getName());
+            System.out.println("New cooking time: " + existingRecipe.getCookingTime());
+            
+            try {
+                int rowsUpdated = recipeRepository.update(recipe_id, existingRecipe);
+                if (rowsUpdated > 0) {
+                    return ResponseEntity.ok("Recipe updated successfully.");
+                } else {
+                    return ResponseEntity.internalServerError().body("No rows updated in database");
+                }
+            } catch (Exception ex) {
+                System.err.println("Error updating recipe: " + ex.getMessage());
+                ex.printStackTrace();
+                return ResponseEntity.internalServerError().body("Error updating recipe: " + ex.getMessage());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("Error updating recipe: " + e.getMessage());
