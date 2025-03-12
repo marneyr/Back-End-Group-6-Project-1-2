@@ -29,7 +29,15 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(authz -> 
                 authz
-                    .requestMatchers("/api/**", "/error", "/").permitAll()
+                    // Public endpoints
+                    .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                    .requestMatchers("/error", "/").permitAll()
+                    // For development access
+                    .requestMatchers("/api/users/test").permitAll()
+                    // Recipe endpoints require authentication (eventually)
+                    // For now we'll keep them public for development
+                    .requestMatchers("/api/recipes/**").permitAll()
+                    // Any other request needs authentication
                     .anyRequest().authenticated()
             )
             .httpBasic(basic -> basic.disable())

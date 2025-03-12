@@ -1,16 +1,12 @@
 package edu.cmcc.cpt.demo.Recipe;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.jdbc.core.RowMapper;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class RecipeRowMapper implements RowMapper<Recipe> {
-    
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
     
     @Override
     public Recipe mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -19,57 +15,31 @@ public class RecipeRowMapper implements RowMapper<Recipe> {
         recipe.setUserId(rs.getInt("user_id"));
         recipe.setName(rs.getString("name"));
         
-        try {
-            recipe.setCookingTime(rs.getString("cooking_time"));
-            recipe.setDifficulty(rs.getString("difficulty"));
-            recipe.setServings(rs.getInt("servings"));
-        } catch (SQLException e) {
-            // Optional fields may be null
-        }
+        // Handle optional fields
+        recipe.setCookingTime(rs.getString("cooking_time"));
+        recipe.setDifficulty(rs.getString("difficulty"));
+        recipe.setServings(rs.getInt("servings"));
         
-        // Handle PostgreSQL array format: convert {item1,item2} to String[]
-        String ingredientsStr = rs.getString("ingredients");
-        if (ingredientsStr != null && !ingredientsStr.isEmpty()) {
+        // Get the raw JSON string for ingredients and instructions
+        String ingredientsJson = rs.getString("ingredients");
+        String instructionsJson = rs.getString("instructions");
+        
+        // Try to parse JSON strings to objects
+        if (ingredientsJson != null) {
             try {
-                // Handle PostgreSQL array format {item1,item2}
-                if (ingredientsStr.startsWith("{") && ingredientsStr.endsWith("}")) {
-                    String[] items = ingredientsStr
-                        .substring(1, ingredientsStr.length() - 1)
-                        .split(",");
-                    recipe.setIngredients(items);
-                } else {
-                    // Try regular JSON parsing as fallback
-                    try {
-                        recipe.setIngredients(objectMapper.readValue(ingredientsStr, String[].class));
-                    } catch (Exception e) {
-                        System.err.println("Error parsing ingredients: " + ingredientsStr);
-                    }
-                }
+                recipe.setIngredients(ingredientsJson);
             } catch (Exception e) {
-                System.err.println("Error processing ingredients: " + ingredientsStr);
+                System.err.println("Error parsing ingredients JSON: " + e.getMessage());
+                recipe.setIngredients(ingredientsJson);
             }
         }
         
-        // Same for instructions
-        String instructionsStr = rs.getString("instructions");
-        if (instructionsStr != null && !instructionsStr.isEmpty()) {
+        if (instructionsJson != null) {
             try {
-                // Handle PostgreSQL array format {item1,item2}
-                if (instructionsStr.startsWith("{") && instructionsStr.endsWith("}")) {
-                    String[] items = instructionsStr
-                        .substring(1, instructionsStr.length() - 1)
-                        .split(",");
-                    recipe.setInstructions(items);
-                } else {
-                    // Try regular JSON parsing as fallback
-                    try {
-                        recipe.setInstructions(objectMapper.readValue(instructionsStr, String[].class));
-                    } catch (Exception e) {
-                        System.err.println("Error parsing instructions: " + instructionsStr);
-                    }
-                }
+                recipe.setInstructions(instructionsJson);
             } catch (Exception e) {
-                System.err.println("Error processing instructions: " + instructionsStr);
+                System.err.println("Error parsing instructions JSON: " + e.getMessage());
+                recipe.setInstructions(instructionsJson);
             }
         }
         

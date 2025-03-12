@@ -1,6 +1,7 @@
 package edu.cmcc.cpt.demo.Recipe;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -51,6 +52,7 @@ public class Recipe {
     public void setInstructions(Object instructions) { this.instructions = instructions; }
 
     // Helper method for converting ingredients to JSON string
+    @JsonIgnore
     public String getIngredientsJson() throws IOException {
         if (ingredients == null) {
             return null;
@@ -62,6 +64,7 @@ public class Recipe {
     }
 
     // Helper method for converting instructions to JSON string
+    @JsonIgnore
     public String getInstructionsJson() throws IOException {
         if (instructions == null) {
             return null;
@@ -70,5 +73,17 @@ public class Recipe {
             return (String) instructions;
         }
         return objectMapper.writeValueAsString(instructions);
+    }
+    
+    // Add toString method for better logging
+    @Override
+    public String toString() {
+        return "Recipe{" +
+                "recipeId=" + recipe_id +
+                ", name='" + name + '\'' +
+                ", cookingTime='" + cookingTime + '\'' +
+                ", difficulty='" + difficulty + '\'' +
+                ", servings=" + servings +
+                '}';
     }
 }

@@ -27,9 +27,43 @@ public class RecipeController {
     @GetMapping("/{recipe_id}")
     public ResponseEntity<Recipe> getRecipeByRecipeId(@PathVariable int recipe_id) {
         try {
+            System.out.println("RecipeController: Requested recipe ID: " + recipe_id);
+            
             Recipe recipe = recipeRepository.findByRecipeId(recipe_id);
-            return recipe != null ? ResponseEntity.ok(recipe) : ResponseEntity.notFound().build();
+            
+            if (recipe == null) {
+                System.out.println("RecipeController: Recipe with ID " + recipe_id + " not found!");
+                return ResponseEntity.notFound().build();
+            }
+            
+            System.out.println("RecipeController: Found recipe - " + recipe.getName() + " (ID: " + recipe.getRecipeId() + ")");
+            
+            // Ensure proper JSON handling
+            if (recipe.getIngredients() instanceof String) {
+                String ingredientsStr = (String) recipe.getIngredients();
+                // Check if it's already JSON-formatted
+                if (ingredientsStr.startsWith("[") && ingredientsStr.endsWith("]")) {
+                    // It's already a JSON array string, keep as is
+                } else {
+                    // Convert to JSON array format
+                    recipe.setIngredients("[\"" + ingredientsStr + "\"]");
+                }
+            }
+            
+            if (recipe.getInstructions() instanceof String) {
+                String instructionsStr = (String) recipe.getInstructions();
+                // Check if it's already JSON-formatted
+                if (instructionsStr.startsWith("[") && instructionsStr.endsWith("]")) {
+                    // It's already a JSON array string, keep as is
+                } else {
+                    // Convert to JSON array format
+                    recipe.setInstructions("[\"" + instructionsStr + "\"]");
+                }
+            }
+            
+            return ResponseEntity.ok(recipe);
         } catch (Exception e) {
+            System.err.println("RecipeController: Error retrieving recipe with ID " + recipe_id + ": " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
